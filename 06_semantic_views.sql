@@ -1,11 +1,11 @@
 -- ============================================================================
 -- ENTERPRISE CONVERSATIONAL AI - 06_SEMANTIC_VIEWS.SQL
 -- ============================================================================
--- Creates two native Snowflake Semantic Views:
---   RELATIONAL_COMPLAINTS_SV: structured customer/product/issue/complaint model
---   GRAPH_COMPLAINTS_SV: graph nodes and edges with typed dimensions
+-- Creates the native structured complaint Semantic View:
+--   RELATIONAL_COMPLAINTS_SV: customer/product/issue/complaint model
 -- Prerequisites: 01_physical_layer.sql, 02_sample_data.sql,
---                03_graph_physical_layer.sql, 04_graph_sample_data.sql.
+-- Run 06a_concrete_views.sql and 06b_sementaic_KG_view.sql afterward to
+-- create the typed graph views and graph Semantic View.
 -- Deploy after reviewing the definitions. Native semantic views are Snowflake
 -- objects; the ontology-stack-builder skill normally builds/tests these via
 -- the semantic-view skill. No Cortex Search dependency in this file.
@@ -64,45 +64,8 @@ CREATE OR REPLACE SEMANTIC VIEW STRUCTURED.RELATIONAL_COMPLAINTS_SV
   )
   COMMENT = 'Relational complaint analysis across customers, product variants, and issue classifications.';
 
--- Graph semantic model. Expose one logical node table and one edge table.
--- NODE_ID and EDGE_ID are globally unique by the ID convention in 03/04.
-CREATE OR REPLACE SEMANTIC VIEW GRAPH.RELATIONAL_GRAPH_COMPLAINTS_SV
-  TABLES (
-    nodes AS GRAPH.KG_NODE
-      PRIMARY KEY (NODE_ID)
-      COMMENT = 'Graph entities; NODE_TYPE identifies CUSTOMER, PRODUCT, ISSUE, or COMPLAINT',
-    edges AS GRAPH.KG_EDGE
-      PRIMARY KEY (EDGE_ID)
-      COMMENT = 'Directed graph relationships; SRC_ID and DST_ID refer to graph nodes'
-  )
-  RELATIONSHIPS (
-    edges_to_source_node AS edges (SRC_ID) REFERENCES nodes (NODE_ID),
-    edges_to_target_node AS edges (DST_ID) REFERENCES nodes (NODE_ID)
-  )
-  FACTS (
-    edges.weight AS WEIGHT COMMENT = 'Relationship weight, defaulting to 1.0'
-  )
-  DIMENSIONS (
-    nodes.node_id AS NODE_ID,
-    nodes.node_type AS NODE_TYPE,
-    nodes.name AS NODE_NAME,
-    nodes.props AS NODE_PROPERTIES,
-    edges.edge_id AS EDGE_ID,
-    edges.edge_type AS EDGE_TYPE,
-    edges.effective_start AS EFFECTIVE_START,
-    edges.effective_end AS EFFECTIVE_END
-  )
-  METRICS (
-    nodes.node_count AS COUNT(DISTINCT NODE_ID)
-      COMMENT = 'Number of distinct graph nodes',
-    edges.edge_count AS COUNT(DISTINCT EDGE_ID)
-      COMMENT = 'Number of distinct graph edges'
-  )
-  COMMENT = 'Graph complaint model for node and relationship inventory; graph traversal remains explicit SQL over KG_EDGE.';
-
--- Describe both deployed semantic views and test a basic semantic query.
+-- Describe the relational Semantic View and test a basic semantic query.
 DESCRIBE SEMANTIC VIEW STRUCTURED.RELATIONAL_COMPLAINTS_SV;
-DESCRIBE SEMANTIC VIEW GRAPH.RELATIONAL_GRAPH_COMPLAINTS_SV;
 
 SELECT * FROM SEMANTIC_VIEW(
   STRUCTURED.RELATIONAL_COMPLAINTS_SV

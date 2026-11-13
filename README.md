@@ -30,9 +30,9 @@ Run these scripts in Snowflake in order:
 4. `03_graph_physical_layer.sql` — creates `GRAPH.KG_NODE` and `GRAPH.KG_EDGE`.
 5. `04_graph_sample_data.sql` — loads graph nodes and edges from the source records.
 6. `05_email_sample_data.sql` — creates and loads synthetic complaint email data.
-7. `06_semantic_views.sql` — creates the relational complaint Semantic View and an initial graph Semantic View.
+7. `06_semantic_views.sql` — creates the relational complaint Semantic View.
 8. `06a_concrete_views.sql` — creates typed graph-backed entity and relationship views in `ONTOLOGY`.
-9. `06b_sementaic_KG_view.sql` — creates/replaces `GRAPH.RELATIONAL_GRAPH_COMPLAINTS_SV` over the concrete views from step 8. Run this after `06_semantic_views.sql` so the typed graph model is the final definition.
+9. `06b_sementaic_KG_view.sql` — creates `GRAPH.RELATIONAL_GRAPH_COMPLAINTS_SV` over the concrete views from step 8.
 10. `07_cortex_search.sql` — creates the email Cortex Search service.
 11. Complete [`09_business_ontology_setup.md`](09_business_ontology_setup.md) using Snowflake's native Business Ontology workflow. This is where the BON domain, terms, relationships, and representations are created and verified; no repository SQL script creates these objects.
 12. `08_cortex_agent.sql` — creates an agent using the relational and graph Semantic Views, email search, and BON search.
