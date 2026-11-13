@@ -16,6 +16,8 @@ This project is a runnable reference implementation for analyzing synthetic cust
 - A warehouse available to that role.
 - The BON domain `Complaints` created, populated, and indexed before creating or testing the agent. Use Snowflake's native Business Ontology workflow to create and govern its terms, relationships, and asset representations.
 
+**Required BON setup:** Follow [09_business_ontology_setup.md](09_business_ontology_setup.md) after the data assets and Cortex Search service are ready, and before running `08_cortex_agent.sql`. That guide lists the domain, terms, relationships, asset bindings, validation checks, and test questions in order.
+
 Feature availability and privileges vary by account. Confirm BON and agent support in your account before deployment.
 
 ## Run order
@@ -32,7 +34,8 @@ Run these scripts in Snowflake in order:
 8. `06a_concrete_views.sql` — creates typed graph-backed entity and relationship views in `ONTOLOGY`.
 9. `06b_sementaic_KG_view.sql` — creates/replaces `GRAPH.RELATIONAL_GRAPH_COMPLAINTS_SV` over the concrete views from step 8. Run this after `06_semantic_views.sql` so the typed graph model is the final definition.
 10. `07_cortex_search.sql` — creates the email Cortex Search service.
-11. `08_cortex_agent.sql` — creates an agent using the relational and graph Semantic Views, email search, and BON search.
+11. Complete [`09_business_ontology_setup.md`](09_business_ontology_setup.md) using Snowflake's native Business Ontology workflow. This is where the BON domain, terms, relationships, and representations are created and verified; no repository SQL script creates these objects.
+12. `08_cortex_agent.sql` — creates an agent using the relational and graph Semantic Views, email search, and BON search.
 
 The SQL files use `CREATE OR REPLACE` for some objects. Review them before rerunning in an account where those objects may already contain changes.
 
